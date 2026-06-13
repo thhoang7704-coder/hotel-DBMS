@@ -3,13 +3,12 @@ package com.example.hotel.User.service;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hotel.User.User;
 import com.example.hotel.User.dto.ChangePasswordRequest;
@@ -24,8 +23,8 @@ import com.example.hotel.User.repository.UserRepository;
 import com.example.hotel.User.service.interfaces.IUserService;
 import com.example.hotel.common.exception.BadRequestException;
 import com.example.hotel.common.exception.ResourceNotFoundException;
-import com.example.hotel.common.response.PageResponse;
-import com.example.hotel.common.response.PageResponseUtil;
+import com.example.hotel.common.response.PaginationResponse;
+import com.example.hotel.common.response.PageRequestDTO;
 import com.example.hotel.common.security.SecurityUtils;
 import com.example.hotel.common.security.UserDetailsImpl;
 
@@ -104,20 +103,15 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public PageResponse<UserListItemDto> getAllUsers(
-            int page,
-            int limit) {
+    @Transactional(readOnly = true)
+    public PaginationResponse<UserListItemDto> getAllUsers(
+            PageRequestDTO pageRequestDTO) {
 
-        Pageable pageable = PageRequest.of(
-                page - 1,
-                limit,
-                Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<UserListItemDto> page = userRepository
+                .findAll(pageRequestDTO.toPageable())
+                .map(this::mapToDto);
 
-        Page<User> users = userRepository.findAll(pageable);
-
-        Page<UserListItemDto> dtoPage = users.map(this::mapToDto);
-
-        return PageResponseUtil.from(dtoPage);
+        return PaginationResponse.fromPage(page);
     }
 
     private UserListItemDto mapToDto(User user) {

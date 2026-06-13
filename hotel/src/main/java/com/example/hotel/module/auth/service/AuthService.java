@@ -1,5 +1,6 @@
 package com.example.hotel.module.auth.service;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -25,6 +26,8 @@ import com.example.hotel.module.auth.dto.TokenRefreshRequest;
 import com.example.hotel.module.auth.dto.TokenRefreshResponse;
 import com.example.hotel.module.auth.entity.RefreshToken;
 import com.example.hotel.module.auth.repository.RefreshTokenRepository;
+import com.example.hotel.module.wallet.entity.Wallet;
+import com.example.hotel.module.wallet.repository.WalletRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +39,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManager authenticationManager;
+    private final WalletRepository walletRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
@@ -70,6 +74,12 @@ public class AuthService {
                 .build();
 
         user = userRepository.save(user);
+        Wallet wallet = Wallet.builder()
+                .user(user)
+                .balance(BigDecimal.ZERO)
+                .build();
+
+        walletRepository.save(wallet);
         // Tạo Tokens
         String jwt = jwtUtil.generateJwtToken(user.getEmail(), user.getId(), user.getRole().name());
         RefreshToken newRefreshToken = createAndSaveRefreshToken(user);

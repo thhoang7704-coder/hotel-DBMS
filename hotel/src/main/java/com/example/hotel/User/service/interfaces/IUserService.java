@@ -9,7 +9,8 @@ import com.example.hotel.User.dto.UpdateProfileResponse;
 import com.example.hotel.User.dto.UserListItemDto;
 import com.example.hotel.User.dto.UserProfileResponse;
 import com.example.hotel.User.dto.UserResponse;
-import com.example.hotel.common.response.PageResponse;
+import com.example.hotel.common.response.PageRequestDTO;
+import com.example.hotel.common.response.PaginationResponse;
 
 public interface IUserService {
     UserProfileResponse getMyProfile();
@@ -18,9 +19,8 @@ public interface IUserService {
 
     void changePassword(ChangePasswordRequest request);
 
-    PageResponse<UserListItemDto> getAllUsers(
-            int page,
-            int limit);
+    PaginationResponse<UserListItemDto> getAllUsers(
+            PageRequestDTO pageRequestDTO);
 
     UserResponse getUserById(UUID id);
 

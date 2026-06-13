@@ -2,6 +2,9 @@ package com.example.hotel.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.math.BigDecimal;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -9,6 +12,8 @@ import org.springframework.stereotype.Component;
 import com.example.hotel.User.User;
 import com.example.hotel.User.repository.UserRepository;
 import com.example.hotel.enums.UserRole;
+import com.example.hotel.module.wallet.entity.Wallet;
+import com.example.hotel.module.wallet.repository.WalletRepository;
 
 @Slf4j
 @Component
@@ -16,6 +21,7 @@ import com.example.hotel.enums.UserRole;
 public class DatabaseInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final WalletRepository walletRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -35,6 +41,12 @@ public class DatabaseInitializer implements CommandLineRunner {
                     .build();
 
             userRepository.save(adminUser);
+            Wallet wallet = Wallet.builder()
+                    .user(adminUser)
+                    .balance(BigDecimal.ZERO)
+                    .build();
+
+            walletRepository.save(wallet);
         } else {
             log.info(">>> Database already initialized (Admin exists)");
         }

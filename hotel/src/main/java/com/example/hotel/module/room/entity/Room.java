@@ -36,6 +36,10 @@ public class Room {
     @Enumerated(EnumType.STRING)
     private RoomStatus status;
 
+    private String imageUrl;
+
     @Version
+    // là cơ chế Optimistic Locking để tránh bị lost update khi nhiều transaction
+    // cùng cập nhật một bản ghi
     private Long version;
 }
